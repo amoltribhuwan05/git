@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   create-tag:
-    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'RELEASE')
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'RELEASE_V')
     runs-on: ubuntu-latest
     
     steps:
