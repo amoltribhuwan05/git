@@ -1,0 +1,32 @@
+name: Auto Tag Release
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  create-tag:
+    if: github.event.pull_request.merged == true && startsWith(github.head_ref, 'RELEASE')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Extract version from branch name
+        id: extract_version
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Branch name: $BRANCH_NAME"
+          echo "version=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          
+      - name: Create and push tag
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "${{ steps.extract_version.outputs.version }}" -m "Release ${{ steps.extract_version.outputs.version }}"
+          git push origin "${{ steps.extract_version.outputs.version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
